@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>NASA Explorer | Buscador Espacial</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <div class="stars stars-one"></div>
+  <div class="stars stars-two"></div>
+
+  <header class="topbar">
+    <a href="/" class="brand">
+      <span class="brand-icon">✦</span>
+      <span>NASA<span class="brand-highlight">EXPLORER</span></span>
+    </a>
+
+    <span class="topbar-label">
+      <span class="status-dot"></span>
+      BUSCADOR ASTRONÔMICO
+    </span>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="eyebrow-line"></span>
+        EXPLORE O DESCONHECIDO
+        <span class="eyebrow-line"></span>
+      </div>
+
+      <h1>
+        Descubra os<br>
+        <span>mistérios do cosmos.</span>
+      </h1>
+
+      <p class="hero-description">
+        Pesquise planetas, estrelas, galáxias e nebulosas.
+        Encontre imagens do universo disponibilizadas pela NASA.
+      </p>
+
+      <div class="hero-decoration">
+        <span>✧</span>
+        <span class="decoration-line"></span>
+        <span class="decoration-orbit">◉</span>
+        <span class="decoration-line"></span>
+        <span>✧</span>
+      </div>
+    </section>
+
+    <section class="search-panel">
+      <div class="panel-heading">
+        <div class="panel-symbol">⌕</div>
+
+        <div>
+          <span class="panel-overline">CENTRAL DE EXPLORAÇÃO</span>
+          <h2>Qual astro você procura?</h2>
+        </div>
+      </div>
+
+      <form action="/pesquisar" method="POST" class="search-form">
+        <label for="astro">NOME DO ASTRO</label>
+
+        <div class="search-input-row">
+          <input
+            type="search"
+            id="astro"
+            name="astro"
+            placeholder="Ex.: Marte, Saturno, Via Láctea..."
+            value="<%= astro %>"
+            maxlength="100"
+            required
+          >
+
+          <button type="submit" class="search-button">
+            <span>Pesquisar</span>
+            <span class="button-arrow">↗</span>
+          </button>
+        </div>
+
+        <p class="form-hint">
+          Experimente pesquisar por Marte, Lua, Júpiter ou nebulosas.
+        </p>
+      </form>
+    </section>
+
+    <% if (erro) { %>
+      <section class="error-panel">
+        <span class="error-icon">!</span>
+        <div>
+          <h3>Não foi possível completar a busca</h3>
+          <p><%= erro %></p>
+        </div>
+      </section>
+    <% } %>
+
+    <% if (imagens.length > 0) { %>
+      <section class="results" id="resultados">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow section-eyebrow">
+              RESULTADOS DA MISSÃO
+            </div>
+
+            <h2>
+              Explorando: <span class="query-name"><%= astro %></span>
+            </h2>
+
+            <p class="section-description">
+              Imagens encontradas na biblioteca da NASA.
+            </p>
+          </div>
+
+          <span class="date-tag">
+            <%= imagens.length %> imagens
+          </span>
+        </div>
+
+        <div class="carousel" id="apod-carousel">
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <% imagens.forEach(function(item) { %>
+                <article class="carousel-slide">
+                  <a
+                    class="carousel-image-link"
+                    href="<%= item.imagem %>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Abrir imagem em tamanho maior"
+                  >
+                    <img
+                      src="<%= item.imagem %>"
+                      alt="<%= item.titulo %>"
+                      loading="lazy"
+                    >
+                  </a>
+
+                  <div class="carousel-info">
+                    <span class="image-label">
+                      ✦ REGISTRO ASTRONÔMICO
+                      <% if (item.data) { %>
+                        · <%= item.data %>
+                      <% } %>
+                    </span>
+
+                    <h3><%= item.titulo %></h3>
+
+                    <p class="description">
+                      <%= item.descricao %>
+                    </p>
+
+                    <% if (item.id) { %>
+                      <span class="image-credit">
+                        Identificação NASA: <%= item.id %>
+                      </span>
+                    <% } %>
+                  </div>
+                </article>
+              <% }); %>
+            </div>
+          </div>
+
+          <div class="carousel-controls">
+            <button
+              type="button"
+              class="carousel-btn"
+              id="carousel-prev"
+              aria-label="Imagem anterior"
+            >←</button>
+
+            <span class="carousel-counter" aria-live="polite">
+              <span id="carousel-current">1</span>
+              /
+              <%= imagens.length %>
+            </span>
+
+            <button
+              type="button"
+              class="carousel-btn"
+              id="carousel-next"
+              aria-label="Próxima imagem"
+            >→</button>
+          </div>
+
+          <div class="carousel-dots" aria-label="Selecionar imagem">
+            <% imagens.forEach(function(item, i) { %>
+              <button
+                type="button"
+                class="carousel-dot <%= i === 0 ? 'active' : '' %>"
+                data-slide="<%= i %>"
+                aria-label="Ir para imagem <%= i + 1 %>"
+              ></button>
+            <% }); %>
+          </div>
+        </div>
+      </section>
+    <% } %>
+
+    <% if (!pesquisou) { %>
+      <section class="welcome-panel">
+        <div class="planet-art">
+          <div class="planet-ring"></div>
+          <div class="planet">✦</div>
+          <span class="planet-moon">●</span>
+          <span class="planet-star star-a">✧</span>
+          <span class="planet-star star-b">✦</span>
+          <span class="planet-star star-c">·</span>
+        </div>
+
+        <div class="welcome-content">
+          <span class="panel-overline">SUA PRÓXIMA DESCOBERTA</span>
+          <h2>O universo está chamando.</h2>
+          <p>
+            Digite o nome de um astro na pesquisa e descubra
+            imagens e informações sobre ele.
+          </p>
+        </div>
+      </section>
+    <% } %>
+
+    <section class="info-strip">
+      <div class="info-item">
+        <span class="info-icon">✧</span>
+        <div>
+          <strong>Imagens espaciais</strong>
+          <span>Biblioteca da NASA</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">⌕</span>
+        <div>
+          <strong>Busca por astro</strong>
+          <span>Pesquise pelo nome</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <span class="info-icon">◎</span>
+        <div>
+          <strong>Explore mais</strong>
+          <span>Descubra novos registros</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">NASA<span>EXPLORER</span></div>
+    <p>Feito para quem olha para as estrelas e quer saber mais.</p>
+    <span class="footer-credit">
+      Imagens e informações consultadas na NASA Image and Video Library
+    </span>
+  </footer>
+
+  <script>
+    const carousel = document.getElementById('apod-carousel');
+
+    if (carousel) {
+      const track = carousel.querySelector('.carousel-track');
+      const slides = carousel.querySelectorAll('.carousel-slide');
+      const prev = document.getElementById('carousel-prev');
+      const next = document.getElementById('carousel-next');
+      const current = document.getElementById('carousel-current');
+      const dots = carousel.querySelectorAll('.carousel-dot');
+
+      let index = 0;
+
+      function mostrarSlide(novoIndex) {
+        index = Math.max(0, Math.min(novoIndex, slides.length - 1));
+
+        track.style.transform = `translateX(-${index * 100}%)`;
+        current.textContent = index + 1;
+
+        prev.disabled = index === 0;
+        next.disabled = index === slides.length - 1;
+
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+          dot.setAttribute(
+            'aria-current',
+            i === index ? 'true' : 'false'
+          );
+        });
+      }
+
+      prev.addEventListener('click', () => mostrarSlide(index - 1));
+      next.addEventListener('click', () => mostrarSlide(index + 1));
+
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => mostrarSlide(i));
+      });
+
+      mostrarSlide(0);
+    }
+  </script>
+</body>
+</html>
